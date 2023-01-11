@@ -1,0 +1,48 @@
+.stat {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.stats .stat-icon {
+    margin:0 10px 10px 0;
+    color: #BDBDBD;
+    display: inline-block;
+    font-size: 36px;
+    text-align: center;
+    vertical-align: middle;
+    width: 50px;
+}
+
+.stat .value {
+    font-size: 30px;
+    line-height: 24px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 500;
+    color:orange;
+}
+
+.stat .name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dashboard-page .stats .stat-progress {
+    height: 2px;
+    margin: 5px 0;
+    color: #85CE36;
+    background-color: #dddddd;
+}
+
+.progress {
+    display: -ms-flexbox;
+    display: flex;
+    height: 1rem;
+    overflow: hidden;
+    font-size: 0.75rem;
+    background-color: #e9ecef;
+    border-radius: 0.25rem;
+}

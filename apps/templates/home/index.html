@@ -7,21 +7,24 @@
 
 {% block content %}
 
-    <div class="content">
+    <div class="content dashboard-page">
         <div class="container-fluid">
+
             <div class="row">
+
                 <div class="col-md-4">
                     <div class="card ">
                         <div class="card-header ">
-                            <h4 class="card-title">Email Statistics</h4>
-                            <p class="card-category">Last Campaign Performance</p>
+                            <h4 class="card-title">Appointments</h4>
+                            <p class="card-category"></p>
                         </div>
                         <div class="card-body ">
-                            <div id="chartPreferences" class="ct-chart ct-perfect-fourth"></div>
+<!--                            <div id="chartPreferences" class="ct-chart ct-perfect-fourth"></div>-->
                             <div class="legend">
-                                <i class="fa fa-circle text-info"></i> Open
-                                <i class="fa fa-circle text-danger"></i> Bounce
-                                <i class="fa fa-circle text-warning"></i> Unsubscribe
+                                <i class="fa fa-circle text-danger"></i> Pending
+                                <i class="fa fa-circle text-info"></i> Booked
+                                <i class="fa fa-circle text-warning"></i> Arrived
+                                <i class="fa fa-circle text-warning"></i> Cancelled
                             </div>
                             <hr>
                             <div class="stats">
@@ -31,29 +34,127 @@
                     </div>
                 </div>
                 <div class="col-md-8">
-                    <div class="card ">
+                    <div class="card stats">
                         <div class="card-header ">
-                            <h4 class="card-title">Users Behavior</h4>
-                            <p class="card-category">24 Hours performance</p>
+                            <h4 class="card-title">Stats</h4>
+                            <p class="card-category">last 6 months</p>
                         </div>
                         <div class="card-body ">
-                            <div id="chartHours" class="ct-chart"></div>
-                        </div>
-                        <div class="card-footer ">
-                            <div class="legend">
-                                <i class="fa fa-circle text-info"></i> Open
-                                <i class="fa fa-circle text-danger"></i> Click
-                                <i class="fa fa-circle text-warning"></i> Click Second Time
+<!--                            <div id="chartHours" class="ct-chart"></div>-->
+                            <div class="row row-sm stats-container border-bottom rounded-1">
+                                <div class="col-12 col-sm-6 stat-col mt-2 border-bottom">
+                                    <div class="stat-icon">
+                                        <i class="nc-icon nc-notes"></i>
+                                    </div>
+                                    <div class="stat">
+                                        <div class="value"> {{ n_appointments }} </div>
+                                        <div class="name"> Appointments </div>
+                                    </div>
+                                    <div class="progress stat-progress">
+                                        <div class="progress-bar" style="width: 100%;"></div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-6 stat-col">
+                                    <div class="stat-icon">
+                                        <i class="nc-icon nc-grid-45"></i>
+                                    </div>
+                                    <div class="stat">
+                                        <div class="value"> {{n_slots}} </div>
+                                        <div class="name"> Slots </div>
+                                    </div>
+                                    <div class="progress stat-progress">
+                                        <div class="progress-bar" style="width: 100%;"></div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-6  stat-col">
+                                    <div class="stat-icon">
+                                        <i class="nc-icon nc-paper-2"></i>
+                                    </div>
+                                    <div class="stat">
+                                        <div class="value"> {{n_schedules}} </div>
+                                        <div class="name"> Schedules </div>
+                                    </div>
+                                    <div class="progress stat-progress">
+                                        <div class="progress-bar" style="width: 100%;"></div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-6  stat-col">
+                                    <div class="stat-icon">
+                                        <i class="fa fa-users"></i>
+                                    </div>
+                                    <div class="stat">
+                                        <div class="value"> {{n_patients}} </div>
+                                        <div class="name"> Patients </div>
+                                    </div>
+                                    <div class="progress stat-progress">
+                                        <div class="progress-bar" style="width: 100%;"></div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-6  stat-col">
+                                    <div class="stat-icon">
+                                        <i class="fa fa-list-alt"></i>
+                                    </div>
+                                    <div class="stat">
+                                        <div class="value"> {{n_practitioners}} </div>
+                                        <div class="name"> Practitioners </div>
+                                    </div>
+                                    <div class="progress stat-progress">
+                                        <div class="progress-bar" style="width: 100%;"></div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-6 stat-col">
+                                    <div class="stat-icon">
+                                        <i class="fas fa-warehouse"></i>
+                                    </div>
+                                    <div class="stat">
+                                        <div class="value"> {{n_organiations}} </div>
+                                        <div class="name"> Organizations </div>
+                                    </div>
+                                    <div class="progress stat-progress">
+                                        <div class="progress-bar" style="width: 100%;"></div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-6 stat-col">
+                                    <div class="stat-icon">
+                                        <i class="fas fa-warehouse-alt"></i>
+                                    </div>
+                                    <div class="stat">
+                                        <div class="value"> {{n_locations}} </div>
+                                        <div class="name"> Locations </div>
+                                    </div>
+                                    <div class="progress stat-progress">
+                                        <div class="progress-bar" style="width: 100%;"></div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-6 stat-col">
+                                    <div class="stat-icon">
+                                        <i class="fa-solid fa-hospital"></i>
+                                    </div>
+                                    <div class="stat">
+                                        <div class="value"> {{n_healthcareServices}} </div>
+                                        <div class="name"> HealthcareServices </div>
+                                    </div>
+                                    <div class="progress stat-progress">
+                                        <div class="progress-bar" style="width: 100%;"></div>
+                                    </div>
+                                </div>
                             </div>
-                            <hr>
-                            <div class="stats">
-                                <i class="fa fa-history"></i> Updated 3 minutes ago
-                            </div>
                         </div>
+<!--                        <div class="card-footer ">-->
+<!--                            <div class="legend">-->
+<!--                                <i class="fa fa-circle text-info"></i> Pending-->
+<!--                                <i class="fa fa-circle text-danger"></i> Booked-->
+<!--                                <i class="fa fa-circle text-warning"></i> A-->
+<!--                            </div>-->
+<!--                            <hr>-->
+<!--                            <div class="stats">-->
+<!--                                <i class="fa fa-history"></i> Updated 3 minutes ago-->
+<!--                            </div>-->
+<!--                        </div>-->
                     </div>
                 </div>
             </div>
-            <div class="row">
+            <div class="row" style="display:none">
                 <div class="col-md-6">
                     <div class="card ">
                         <div class="card-header ">

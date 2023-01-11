@@ -1,4 +1,4 @@
-<div class="sidebar" data-image="{{ ASSETS_ROOT }}/img/sidebar-5.jpg">
+<div class="sidebar" data-image="{{ ASSETS_ROOT }}/img/sidebar-5.jpg" data-color="orange" >
     <!--
 Tip 1: You can change the color of the sidebar using: data-color="purple | blue | green | orange | red"
 
@@ -7,7 +7,7 @@ Tip 2: you can also add an image using data-image tag
     <div class="sidebar-wrapper">
         <div class="logo">
             <a href="/" class="simple-text">
-                Django Light
+                FHIR Demo Client
             </a>
         </div>
         <ul class="nav">
@@ -25,27 +25,27 @@ Tip 2: you can also add an image using data-image tag
                 </a>
             </li>
             <li class="nav-item nav-item {% if 'table' in segment %} active {% endif %}">
-                <a class="nav-link" href="/table.html">
+                <a class="nav-link" href="/appointments">
                     <i class="nc-icon nc-notes"></i>
-                    <p>Table List</p>
+                    <p>Appointments</p>
                 </a>
             </li>
             <li class="nav-item nav-item {% if 'typography' in segment %} active {% endif %}">
                 <a class="nav-link" href="/typography.html">
                     <i class="nc-icon nc-paper-2"></i>
-                    <p>Typography</p>
+                    <p>Hospitals</p>
                 </a>
             </li>
             <li class="nav-item nav-item {% if 'icons' in segment %} active {% endif %}">
                 <a class="nav-link" href="/icons.html">
                     <i class="nc-icon nc-atom"></i>
-                    <p>Icons</p>
+                    <p>Healthcare Services</p>
                 </a>
             </li>
             <li class="nav-item nav-item {% if 'maps' in segment %} active {% endif %}">
                 <a class="nav-link" href="/maps.html">
                     <i class="nc-icon nc-pin-3"></i>
-                    <p>Maps</p>
+                    <p>Practitioners</p>
                 </a>
             </li>
             <li class="nav-item nav-item {% if 'notif' in segment %} active {% endif %}">
@@ -54,12 +54,12 @@ Tip 2: you can also add an image using data-image tag
                     <p>Notifications</p>
                 </a>
             </li>
-            <li class="nav-item nav-item {% if '404' in segment %} active {% endif %}">
-                <a class="nav-link" href="/page-404.html">
-                    <i class="nc-icon nc-settings-gear-64"></i>
-                    <p>Error 404</p>
-                </a>
-            </li>
+<!--            <li class="nav-item nav-item {% if '404' in segment %} active {% endif %}">-->
+<!--                <a class="nav-link" href="/page-404.html">-->
+<!--                    <i class="nc-icon nc-settings-gear-64"></i>-->
+<!--                    <p>Error 404</p>-->
+<!--                </a>-->
+<!--            </li>-->
             <li>
                 <a class="nav-link" href="{% url 'logout' %}">
                     <i class="nc-icon nc-button-power"></i>
@@ -67,21 +67,21 @@ Tip 2: you can also add an image using data-image tag
                 </a>
             </li>
             
-            <li class="nav-item active active-pro">
-                <a class="nav-link active" target="_blank" 
-                   href="https://appseed.us/admin-dashboards/django-dashboard-material-pro">
-                    <i class="nc-icon nc-spaceship"></i>
-                    <p>PRO Version</p>
-                </a>
-            </li>
+<!--            <li class="nav-item active active-pro">-->
+<!--                <a class="nav-link active" target="_blank" -->
+<!--                   href="https://appseed.us/admin-dashboards/django-dashboard-material-pro">-->
+<!--                    <i class="nc-icon nc-spaceship"></i>-->
+<!--                    <p>PRO Version</p>-->
+<!--                </a>-->
+<!--            </li>-->
             {% else %}
-            <li class="nav-item active">
-                <a class="nav-link active" target="_blank" 
-                   href="https://appseed.us/admin-dashboards/django-dashboard-material-pro">
-                    <i class="nc-icon nc-spaceship"></i>
-                    <p>PRO Version</p>
-                </a>
-            </li>
+<!--            <li class="nav-item active">-->
+<!--                <a class="nav-link active" target="_blank" -->
+<!--                   href="https://appseed.us/admin-dashboards/django-dashboard-material-pro">-->
+<!--                    <i class="nc-icon nc-spaceship"></i>-->
+<!--                    <p>PRO Version</p>-->
+<!--                </a>-->
+<!--            </li>-->
             {% endif %}
         </ul>
     </div>
