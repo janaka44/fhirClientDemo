@@ -1,0 +1,78 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} UI Tables {% endblock %} 
+{% load humanize %}
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <div class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card strpied-tabled-with-hover">
+                        <div class="card-header ">
+                            <h4 class="card-title"><i class="text-secondary fas fa-hospital-user mr-2"></i>Patients</h4>
+                            <p class="card-category"></p>
+                        </div>
+                        <div class="card-body table-full-width table-responsive">
+                            <table class="table table-hover table-striped">
+                                <thead>
+                                    <th>ID</th>
+                                    <th>SSN / MRN</th>
+                                    <th>Name</th>
+                                    <th>Data of Birth</th>
+                                    <th>Address
+                                    <th>Contact Info</th>
+                                    <th></th>
+                                </thead>
+                                <tbody>
+                                    {% for row in rows %}
+                                    <tr>
+                                        <td>{{ row.id }}</td>
+                                        <td>
+                                        {% for id in row.identifier %}
+                                            {% if id.type.text %}
+                                                {{ id.type.text }}</br><b>{{ id.value }}</b></br></br>
+                                            {% endif %}
+                                        {% endfor %}
+                                        </td>
+                                        <td>{% if row.gender == "male" %}
+                                                <i class="fas fa-2x fa-male text-primary mr-2"></i>
+                                            {% elif row.gender == "female" %}
+                                                <i class="fas fa-2x fa-female text-danger mr-2"></i>
+                                            {% endif %}
+                                            {{ row.name.0.prefix|default:"" }} {{ row.name.0.given.0 }} {{ row.name.0.family }} {{ row.name.0.suffix.0 }}
+                                        </td>
+                                        <td>{{ row.birthDate.date |date:"Y-m-d" }}</td>
+                                        <td>{% if row.address.0.text %}
+                                                {{ row.address.0.text }}
+                                            {% else %}
+                                                {{ row.address.0.line.0 }}, {{ row.address.0.city }}, {{ row.address.0.state }} {{ row.address.0.postalCode }}, {{ row.address.0.country }}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% for contact in row.telecom %}
+                                                {% if contact.system %}
+                                                    {{ contact.system|capfirst  }}: <a href="{{ contact.value }}">{{ contact.value }}</a></br>
+                                                 {% endif %}
+                                            {% endfor %}
+                                        </td>
+                                        <td>{% include "layouts/more-auto-narrative.html" %}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

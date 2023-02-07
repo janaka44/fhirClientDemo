@@ -24,7 +24,7 @@ def showDashboard(request):
     context = {
         'full_name': smart.human_name(patient.name[0]),
         'dob': patient.birthDate.isostring,
-        'phone' : patient.telecom[0].value,
+        'phone': patient.telecom[0].value,
     }
     return HttpResponse(f"Patient: Name={smart.human_name(patient.name[0])}, DOB: {patient.birthDate.isostring}")
     #return render(request, 'dashboard/dashboard.html', context)

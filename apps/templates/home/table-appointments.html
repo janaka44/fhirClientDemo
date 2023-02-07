@@ -1,0 +1,61 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} UI Tables {% endblock %} 
+{% load humanize %}
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+{% endblock stylesheets %}
+
+{% block content %}
+
+    <div class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card strpied-tabled-with-hover">
+                        <div class="card-header ">
+                            <a href="add-appointment" href="">
+                                <button class="float-right p-2" >Add Appointment</button>
+                            </a>
+                            <h4 class="card-title"><i class="text-secondary fas fa-calendar-check mr-2"></i>Appointments</h4>
+                            <p class="card-category"></p>
+                        </div>
+                        <div class="card-body table-full-width table-responsive">
+                            <table class="table table-hover table-striped">
+                                <thead>
+                                    <th>ID</th>
+                                    <th>Date / Time</th>
+                                    {% for participant in rows.0.participant %}
+                                        <th>{{ participant.actor.reference }}</th>
+                                    {% endfor %}
+                                    <th>Description</th>
+                                    <th>Status</th>
+                                    <th></th>
+                                </thead>
+                                <tbody>
+                                    {% for row in rows %}
+                                    <tr class="even pointer" onclick="edit('EDIT_FORM', event, '/add-appointment/{{ row.pk }}', '{{ row.pk }}')">
+                                        <td>{{ row.id }}</td>
+                                        <td>{{ row.start.date | date:"Y-m-d" }}</td>
+                                        {% for participant in row.participant %}
+                                            <td>{{ participant.actor.display }}</td>
+                                        {% endfor %}
+                                        <td>{{ row.description }}</td>
+                                        <td>{{ row.status }}</td>
+                                        <td>{% include "layouts/more-auto-narrative.html" %}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

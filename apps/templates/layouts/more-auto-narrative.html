@@ -1,0 +1,9 @@
+<a class="btn btn-primary mt-2" data-toggle="collapse" href="#multiCollapseExample1" role="button" aria-expanded="false" aria-controls="multiCollapseExample1">More...</a>
+<br/>
+<div class="collapse multi-collapse" id="multiCollapseExample1">
+  <div class="card card-body">
+    {% autoescape off %}
+        {{ row.text.div }}
+    {% endautoescape %}
+  </div>
+</div>

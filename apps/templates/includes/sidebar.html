@@ -1,55 +1,61 @@
-<div class="sidebar" data-image="{{ ASSETS_ROOT }}/img/sidebar-5.jpg" data-color="orange" >
+<div class="sidebar" data-image="{{ ASSETS_ROOT }}/img/sidebar-6.jpg" data-color="blue" >
     <!--
 Tip 1: You can change the color of the sidebar using: data-color="purple | blue | green | orange | red"
 
 Tip 2: you can also add an image using data-image tag
 -->
     <div class="sidebar-wrapper">
-        <div class="logo">
+        <div class="logo h5">
+            <b>FHIR Demo Client </b>
             <a href="/" class="simple-text">
-                FHIR Demo Client
             </a>
         </div>
         <ul class="nav">
             {% if request.user.is_authenticated %}
             <li class="nav-item nav-item {% if 'index' in segment %} active {% endif %}">
                 <a class="nav-link" href="/">
-                    <i class="nc-icon nc-chart-pie-35"></i>
+                    <i class="fas fa-solar-panel"></i>
                     <p>Dashboard</p>
                 </a>
             </li>
             <li class="nav-item nav-item {% if 'user' in segment %} active {% endif %}">
                 <a class="nav-link" href="/user.html">
-                    <i class="nc-icon nc-circle-09"></i>
+                    <i class="fas fa-user-circle"></i>
                     <p>User Profile</p>
                 </a>
             </li>
             <li class="nav-item nav-item {% if 'table' in segment %} active {% endif %}">
+                <a class="nav-link" href="/patients">
+                    <i class="fas fa-hospital-user"></i>
+                    <p>Patients</p>
+                </a>
+            </li>
+            <li class="nav-item nav-item {% if 'table' in segment %} active {% endif %}">
                 <a class="nav-link" href="/appointments">
-                    <i class="nc-icon nc-notes"></i>
+                    <i class="fas fa-calendar-check"></i>
                     <p>Appointments</p>
                 </a>
             </li>
             <li class="nav-item nav-item {% if 'typography' in segment %} active {% endif %}">
-                <a class="nav-link" href="/typography.html">
-                    <i class="nc-icon nc-paper-2"></i>
+                <a class="nav-link" href="/hospitals">
+                    <i class="fas fa-building"></i>
                     <p>Hospitals</p>
                 </a>
             </li>
             <li class="nav-item nav-item {% if 'icons' in segment %} active {% endif %}">
-                <a class="nav-link" href="/icons.html">
-                    <i class="nc-icon nc-atom"></i>
+                <a class="nav-link" href="/healthcare-services">
+                    <i class="fas fa-briefcase-medical"></i>
                     <p>Healthcare Services</p>
                 </a>
             </li>
             <li class="nav-item nav-item {% if 'maps' in segment %} active {% endif %}">
-                <a class="nav-link" href="/maps.html">
-                    <i class="nc-icon nc-pin-3"></i>
+                <a class="nav-link" href="/practitioners">
+                    <i class="fas fa-user-md"></i>
                     <p>Practitioners</p>
                 </a>
             </li>
             <li class="nav-item nav-item {% if 'notif' in segment %} active {% endif %}">
-                <a class="nav-link" href="/notifications.html">
+                <a class="nav-link" href="/notifications">
                     <i class="nc-icon nc-bell-55"></i>
                     <p>Notifications</p>
                 </a>

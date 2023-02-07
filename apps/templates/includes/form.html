@@ -1,0 +1,40 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} UI Tables {% endblock %}
+{% load humanize %}
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+{% endblock stylesheets %}
+
+{% block content %}
+{% load crispy_forms_tags %}
+<form data-ajax--url="{{ url }}" id="formDialog" method="POST" data-url="" class="create-form" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="model-header" style="padding-top">
+        <h5 class="model-title confirm-dialog-title">{{ title }}</h5>
+        <small class="error red" style="margin-left:10px;"></small>
+    </div>
+    <div class="modal-body">
+        <input type="hidden" id="id_record" value="{{ pk }}"/>
+        <input type="hidden" id="hidden_id_1" value="{{ hidden_id_1 }}"/>
+        <input type="hidden" id="caseId" value="{{ caseId }}"/>
+        {% for prop in props %}
+            {{ forloop.counter }}. {{ prop|capfirst }}<input type="text"><br>
+            <p class=""></p>
+        {% endfor %}
+        <hr>
+        {{ props_anno_list }}
+        {% for key, value in props_anno_list.items %}
+            {{ forloop.counter }}.{{ key }}
+            <br>
+        {% endfor %}
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary"   id="addFormSave">Save</button>
+    </div>
+</form>
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

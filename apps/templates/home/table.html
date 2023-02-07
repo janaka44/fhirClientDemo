@@ -23,6 +23,7 @@
                                     <th>Date / Time</th>
                                     <th>Location</th>
                                     <th>Patient</th>
+                                    <th>Description</th>
                                     <th>Practitioner</th>
                                     <th>Status</th>
                                 </thead>
@@ -33,6 +34,7 @@
                                         <td>{{ row.start.date | date:"Y-m-d" }}</td>
                                         <td>{{ row.actor }}</td>
                                         <td>{{ row.participant }}</td>
+                                        <td>{{ row.description }}</td>
                                         <td>{{ row.participant }}</td>
                                         <td>{{ row.status }}</td>
                                     </tr>

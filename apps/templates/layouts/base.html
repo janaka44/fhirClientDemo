@@ -41,6 +41,7 @@
  
     <!-- Specific Page CSS goes HERE  -->
     {% block stylesheets %}{% endblock stylesheets %}
+     {% block scripts %}{% endblock scripts %}
 
  </head>
  
@@ -52,6 +53,13 @@
          <div class="main-panel">
              
              {% include 'includes/navigation.html' %}
+
+             <!--Add New modal form -->
+            <div class="modal fade" id="modalFormAdd" tabindex="-1" style="z-index:2500" >
+                <div class="modal-dialog">
+                    <div class="model-content"></div>
+                </div>
+            </div>
  
              {% block content %}{% endblock content %}
              

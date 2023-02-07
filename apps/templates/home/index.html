@@ -13,9 +13,11 @@
             <div class="row">
 
                 <div class="col-md-4">
-                    <div class="card ">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card ">
                         <div class="card-header ">
-                            <h4 class="card-title">Appointments</h4>
+                            <h4 class="card-title">Appointments by Doctor</h4>
                             <p class="card-category"></p>
                         </div>
                         <div class="card-body ">
@@ -27,9 +29,34 @@
                                 <i class="fa fa-circle text-warning"></i> Cancelled
                             </div>
                             <hr>
-                            <div class="stats">
-                                <i class="fa fa-clock-o"></i> Campaign sent 2 days ago
-                            </div>
+                            <table class="table table-hover table-striped">
+                                <thead>
+                                    <th>ID</th>
+                                    <th>Date / Time</th>
+                                    <th>Doctor</th>
+                                    <th>Status</th>
+                                </thead>
+                                <tbody>
+                                {% for row in app_doctors %}
+                                    <tr class="even pointer">
+                                        <td>{{ row.id }}</td>
+                                        <td>{{ row.date | date:"Y-m-d" }}</td>
+                                        <td>{{ row.doctor }}</td>
+                                        <td>{{ row.status }}</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+<!--                            <div class="stats">-->
+<!--                                <i class="fa fa-clock-o"></i> Campaign sent 2 days ago-->
+<!--                            </div>-->
+                        </div>
+                    </div>
+                        </div>
+                        <div class="col-md-12">
+                             <a href="load-appointments" href="">
+                                <button>Load Appointments</button>
+                             </a>
                         </div>
                     </div>
                 </div>
@@ -44,7 +71,7 @@
                             <div class="row row-sm stats-container border-bottom rounded-1">
                                 <div class="col-12 col-sm-6 stat-col mt-2 border-bottom">
                                     <div class="stat-icon">
-                                        <i class="nc-icon nc-notes"></i>
+                                        <i class="fas fa-calendar-check"></i>
                                     </div>
                                     <div class="stat">
                                         <div class="value"> {{ n_appointments }} </div>
@@ -54,9 +81,9 @@
                                         <div class="progress-bar" style="width: 100%;"></div>
                                     </div>
                                 </div>
-                                <div class="col-12 col-sm-6 stat-col">
+                                <div class="col-12 col-sm-6 stat-col mt-2">
                                     <div class="stat-icon">
-                                        <i class="nc-icon nc-grid-45"></i>
+                                        <i class="fas fa-calendar-day"></i>
                                     </div>
                                     <div class="stat">
                                         <div class="value"> {{n_slots}} </div>
@@ -66,9 +93,9 @@
                                         <div class="progress-bar" style="width: 100%;"></div>
                                     </div>
                                 </div>
-                                <div class="col-12 col-sm-6  stat-col">
+                                <div class="col-12 col-sm-6  stat-col  mt-2">
                                     <div class="stat-icon">
-                                        <i class="nc-icon nc-paper-2"></i>
+                                        <i class="fas fa-calendar-alt"></i>
                                     </div>
                                     <div class="stat">
                                         <div class="value"> {{n_schedules}} </div>
@@ -78,9 +105,9 @@
                                         <div class="progress-bar" style="width: 100%;"></div>
                                     </div>
                                 </div>
-                                <div class="col-12 col-sm-6  stat-col">
+                                <div class="col-12 col-sm-6  stat-col mt-2">
                                     <div class="stat-icon">
-                                        <i class="fa fa-users"></i>
+                                        <i class="fas fa-hospital-user"></i>
                                     </div>
                                     <div class="stat">
                                         <div class="value"> {{n_patients}} </div>
@@ -90,9 +117,9 @@
                                         <div class="progress-bar" style="width: 100%;"></div>
                                     </div>
                                 </div>
-                                <div class="col-12 col-sm-6  stat-col">
+                                <div class="col-12 col-sm-6  stat-col mt-2">
                                     <div class="stat-icon">
-                                        <i class="fa fa-list-alt"></i>
+                                        <i class="fas fa-user-md"></i>
                                     </div>
                                     <div class="stat">
                                         <div class="value"> {{n_practitioners}} </div>
@@ -102,21 +129,21 @@
                                         <div class="progress-bar" style="width: 100%;"></div>
                                     </div>
                                 </div>
-                                <div class="col-12 col-sm-6 stat-col">
+                                <div class="col-12 col-sm-6 stat-col mt-2">
                                     <div class="stat-icon">
-                                        <i class="fas fa-warehouse"></i>
+                                        <i class="fas fa-clinic-medical"></i>
                                     </div>
                                     <div class="stat">
                                         <div class="value"> {{n_organiations}} </div>
-                                        <div class="name"> Organizations </div>
+                                        <div class="name"> Hospitals </div>
                                     </div>
                                     <div class="progress stat-progress">
                                         <div class="progress-bar" style="width: 100%;"></div>
                                     </div>
                                 </div>
-                                <div class="col-12 col-sm-6 stat-col">
+                                <div class="col-12 col-sm-6 stat-col mt-2">
                                     <div class="stat-icon">
-                                        <i class="fas fa-warehouse-alt"></i>
+                                        <i class="fas fa-building"></i>
                                     </div>
                                     <div class="stat">
                                         <div class="value"> {{n_locations}} </div>
@@ -126,13 +153,37 @@
                                         <div class="progress-bar" style="width: 100%;"></div>
                                     </div>
                                 </div>
-                                <div class="col-12 col-sm-6 stat-col">
+                                <div class="col-12 col-sm-6 stat-col mt-2">
                                     <div class="stat-icon">
-                                        <i class="fa-solid fa-hospital"></i>
+                                        <i class="fas fa-briefcase-medical"></i>
                                     </div>
                                     <div class="stat">
                                         <div class="value"> {{n_healthcareServices}} </div>
-                                        <div class="name"> HealthcareServices </div>
+                                        <div class="name"> Healthcare Services </div>
+                                    </div>
+                                    <div class="progress stat-progress">
+                                        <div class="progress-bar" style="width: 100%;"></div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-6 stat-col mt-2">
+                                    <div class="stat-icon">
+                                        <i class="fas fa-briefcase-medical"></i>
+                                    </div>
+                                    <div class="stat">
+                                        <div class="value"> {{n_encounters}} </div>
+                                        <div class="name"> Encounters </div>
+                                    </div>
+                                    <div class="progress stat-progress">
+                                        <div class="progress-bar" style="width: 100%;"></div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-6 stat-col mt-2">
+                                    <div class="stat-icon">
+                                        <i class="fas fa-briefcase-medical"></i>
+                                    </div>
+                                    <div class="stat">
+                                        <div class="value"> {{n_conditions}} </div>
+                                        <div class="name"> Conditions </div>
                                     </div>
                                     <div class="progress stat-progress">
                                         <div class="progress-bar" style="width: 100%;"></div>
