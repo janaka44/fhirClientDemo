@@ -3,6 +3,7 @@
 Copyright (c) 2019 - present AppSeed.us
 """
 import json
+import math
 
 from django import template
 from django.contrib.auth.decorators import login_required
@@ -13,6 +14,7 @@ from django.urls import reverse
 from fhirclient import client
 import logging
 
+from fhirclient.models.fhirabstractbase import FHIRValidationError
 
 # from apps.home.forms import FhirAppointmentForm
 # from apps.home.models import FhirAppointment
@@ -34,11 +36,22 @@ def index(request):
 
 def create_smart_client():
     # Init FHIR Server
-    settings = {
+    settings1 = {
         'app_id': 'IRIS_LOCAL_SERVER',
         'api_base': 'http://localhost:52773/csp/healthshare/fhirserveriris/fhir/r4'
     }
-    smart = client.FHIRClient(settings=settings)
+
+    settings2 = {
+        'app_id': 'HAPI_CLOUD_SERVER',
+        'api_base': 'https://hapi.fhir.org/baseR4'
+    }
+
+    settings = {
+        'app_id': 'FIRELY_CLOUD_SERVER',
+        'api_base': 'https://server.fire.ly/r4'
+    }
+
+    smart = client.FHIRClient(settings=settings2)
     return smart
 
 
@@ -47,11 +60,37 @@ def print_resource(resource, indent=None, length=100):
     print(s[:length-4]+' ...' if len(s)>length else s)
 
 
-def get_stats():
-    smart = create_smart_client()
+def get_stat_row(resource_name, group_name, stat_number, icon_css):
+    row_stat = {}
+    row_stat['resource'] = resource_name
+    row_stat['group_name'] = group_name
+    row_stat['number'] = stat_number
+    row_stat['icon'] = icon_css
+    if group_name == 'Planning':
+        group_color = '#25629fbb'
+    elif group_name == 'Base':
+        group_color = '#5a5a5abb'
+    elif group_name == 'Clinical':
+        group_color = '#dc3545bb'
+    elif group_name == 'Financial':
+        group_color = '#28a745bb'
+    row_stat['group_color'] = group_color
 
+    return row_stat
+
+
+# Get stats from each FHIR Res
+def get_resource_stats(res_class, search_cri, smart_server):
+    try:
+        return res_class.where(search_cri).perform_resources(smart_server)
+    except FHIRValidationError:
+        return () # return an empty list
+
+
+# Get Dashboard stats from ALL FHIR Res
+def get_stats():
+    # do local imports
     import fhirclient.models.patient as pat
-    patient = pat.Patient.read('13', smart.server)
     import fhirclient.models.appointment as app
     import fhirclient.models.slot as slo
     import fhirclient.models.schedule as sch
@@ -61,60 +100,142 @@ def get_stats():
     import fhirclient.models.healthcareservice as hsv
     import fhirclient.models.encounter as enc
     import fhirclient.models.condition as con
+    import fhirclient.models.allergyintolerance as alg
+    import fhirclient.models.task as tas
+    import fhirclient.models.observation as obs
+    import fhirclient.models.procedure as pro
+    import fhirclient.models.diagnosticreport as diag
+    import fhirclient.models.medicationrequest as mr
+    import fhirclient.models.medication as med
+    import fhirclient.models.medicationstatement as ms
+    import fhirclient.models.servicerequest as sr
+    import fhirclient.models.immunization as imm
+    import fhirclient.models.claim as cla
+    import fhirclient.models.claimresponse as cr
+    import fhirclient.models.paymentnotice as pn
+
+    smart = create_smart_client()
+    context = {}
 
 # 'participant.actor': '13'
-    #     _summary=count
+    #     _summary=count,
+
     # appointments    = app.Appointment.where(struct={'_summary': 'count'}).perform_resources(smart.server)
+    summary_search = struct={'_summary': 'true'}
+    # summary_search  = struct = {}
+    # list of FHIR classes
+    class_list = [app.Appointment, slo.Slot, sch.Schedule, tas.Task, pat.Patient, pra.Practitioner,
+                  # 0-5
+                  org.Organization, loc.Location, hsv.HealthcareService, enc.Encounter, con.Condition,
+                  # 6-10
+                  alg.AllergyIntolerance, pro.Procedure, obs.Observation, diag.DiagnosticReport,
+                  # 11-14
+                  mr.MedicationRequest, ms.MedicationStatement, sr.ServiceRequest, med.Medication,
+                  # 15-18
+                  imm.Immunization, cla.Claim, cr.ClaimResponse, pn.PaymentNotice,
+                  # 19-22
+                  ]
+    # response object collection
+    collection_list = []
 
-    appointments    = app.Appointment.where(struct={}).perform_resources(smart.server)
-    slots           = slo.Slot.where(struct={}).perform_resources(smart.server)
-    schedules       = sch.Schedule.where(struct={}).perform_resources(smart.server)
-    patients        = pat.Patient.where(struct={}).perform_resources(smart.server)
-    practitioners   = pra.Practitioner.where(struct={}).perform_resources(smart.server)
-    organiations    = org.Organization.where(struct={}).perform_resources(smart.server)
-    locations       = loc.Location.where(struct={}).perform_resources(smart.server)
-    healthcareServices = hsv.HealthcareService.where(struct={}).perform_resources(smart.server)
-    encounters      = enc.Encounter.where(struct={}).perform_resources(smart.server)
-    conditions      = con.Condition.where(struct={}).perform_resources(smart.server)
+    try:
+        import time
+        start = time.time()
+        for fhir_class_obj in class_list:
+            collection_list.append(get_resource_stats(fhir_class_obj, summary_search, smart.server))
+        end = time.time()
+        print(f'{len(collection_list)} FHIR resources took {math.trunc(end - start)} secs')
 
-    # TODO: remove prints
-    app_doctors = []
-    logger.debug(f' len(appointments)={ len(appointments)}')
-    for appointment in appointments:
-        # print(appointment.as_json())
-        for participant in appointment.participant:
+        # Construct list of stats into a list of dictionaries
+        planning_list = []
+        planning_list.append(get_stat_row('Appointments', 'Planning', len(collection_list[0]), 'fas fa-calendar-check'))
+        planning_list.append(get_stat_row('Slot', 'Planning', len(collection_list[1]), 'fas fa-calendar-day'))
+        planning_list.append(get_stat_row('Schedule', 'Planning', len(collection_list[2]), 'fas fa-calendar-alt'))
+        planning_list.append(get_stat_row('Tasks', 'Planning', len(collection_list[3]), 'fas fa-tasks'))
+        planning_list.append(get_stat_row('Service Requests', 'Planning', len(collection_list[17]), 'fas fa-notes-medical'))
 
-            # print(f'participant.type={participant.actor.reference[0:13]}')
+        base_list = []
+        base_list.append(get_stat_row('Patients', 'Base', len(collection_list[4]), 'fas fa-hospital-user'))
+        base_list.append(get_stat_row('Practitioners', 'Base', len(collection_list[5]), 'fas fa-user-md'))
+        base_list.append(get_stat_row('Hospitals', 'Base', len(collection_list[6]), 'fas fa-clinic-medical'))
+        base_list.append(get_stat_row('Locations', 'Base', len(collection_list[7]), 'fas fa-building'))
+        base_list.append(get_stat_row('Healthcare Services', 'Base', len(collection_list[8]), 'fas fa-briefcase-medical'))
+        base_list.append(get_stat_row('Encounters', 'Base', len(collection_list[9]), 'fas fa-briefcase-medical'))
 
-            if participant.actor.reference[0:13] == "Practitioner/":
-                row = {}
-                # [e for e in patient_bundle.entry if e.resource.resource_type=='Encounter'][0].resource.subject
-                row["doctor"] = participant.actor.display
-                if participant.period is not None:
-                    row["date"] = participant.period
-                    print(f'participant.period={participant.period}')
-                else:
-                    row["date"] = appointment.start
-                    print(f'appointment.start={appointment.start}')
-                row["status"] = participant.status
-                app_doctors.append(row)
+        clinical_list = []
+        clinical_list.append(get_stat_row('Conditions', 'Clinical', len(collection_list[10]), 'fa fa-user-injured'))
+        clinical_list.append(get_stat_row('Allergies', 'Clinical', len(collection_list[11]), 'fas fa-allergies'))
+        clinical_list.append(get_stat_row('Observations', 'Clinical', len(collection_list[13]), 'fas fa-microscope'))
+        clinical_list.append(get_stat_row('Procedures', 'Clinical', len(collection_list[12]), 'fas fa-procedures'))
+        clinical_list.append(get_stat_row('Diagnostic Reports', 'Clinical', len(collection_list[14]), 'fas fa-diagnoses'))
+        clinical_list.append(get_stat_row('Medi. Requests', 'Clinical', len(collection_list[15]), 'fas fa-prescription-bottle'))
+        clinical_list.append(get_stat_row('Medi. Statements', 'Clinical', len(collection_list[16]), 'fas fa-file-prescription'))
+        clinical_list.append(get_stat_row('Medications', 'Clinical', len(collection_list[18]), 'fas fa-capsules'))
+        clinical_list.append(get_stat_row('Immunizations', 'Clinical', len(collection_list[19]), 'fas fa-syringe'))
 
-        # print(appointment)
+        financial_list = []
+        financial_list.append(get_stat_row('Claim', 'Financial', len(collection_list[20]), 'fas fa-file-invoice-dollar'))
+        financial_list.append(get_stat_row('Claim Responses', 'Financial', len(collection_list[21]), 'fas fa-receipt'))
+        financial_list.append(get_stat_row('Payment', 'Financial', len(collection_list[22]), 'far fa-credit-card'))
+        # stat_list.append(get_stat_row('', len(), 'fas '))
+        # logger.debug(f' len(appointments)={len(appointments)}')
 
-    context = {
-        'n_appointments': len(appointments),
-        'n_slots': len(slots),
-        'n_schedules': len(schedules),
-        'n_patients': len(patients),
-        'n_practitioners': len(practitioners),
-        'n_organiations': len(organiations),
-        'n_locations': len(locations),
-        'n_healthcareServices': len(healthcareServices),
-        'n_conditions': len(conditions),
-        'n_encounters': len(encounters),
-        'app_doctors': app_doctors
-    }
-    print(f'doctors={app_doctors[0]}')
+
+        # Get appointment list
+        app_doctors = []
+
+        # appointments = appointments.sort()
+        last_doc = ""
+        #
+        # for appointment in appointments:
+        #     from datetime import datetime
+        #     # print(appointment.as_json())
+        #
+        #     for participant in appointment.participant:
+        #
+        #         # print(f'participant.type={participant.actor.reference[0:13]}')
+        #         if participant.actor is None:
+        #             continue
+        #
+        #         if participant.actor.reference[0:13] == "Practitioner/":
+        #             row = {}
+        #             # [e for e in patient_bundle.entry if e.resource.resource_type=='Encounter'][0].resource.subject
+        #             # add only unique doctors
+        #             if last_doc != participant.actor.display:
+        #                 row["doctor"] = participant.actor.display
+        #                 last_doc = participant.actor.display
+        #             else:
+        #                 row["doctor"] = ""
+        #
+        #             if participant.period is not None:
+        #                 row["date"] = participant.period
+        #                 print(f'participant.period={participant.period}')
+        #             else:
+        #                 # row["date"] = datetime.strptime(appointment.start.__str__(), '%y-%m-%dT%H:%M:%S')
+        #                 row["date"] = appointment.start.isostring
+        #                 print(f'appointment.start={appointment.start.isostring}')
+        #             row["status"] = participant.status
+        #             row["priority"] = appointment.priority
+        #             app_doctors.append(row)
+
+            # print(appointment)
+
+        context = {
+            'app_doctors': app_doctors,
+            'base_list': base_list,
+            'planning_list': planning_list,
+            'financial_list': financial_list,
+            'clinical_list': clinical_list,
+            'server_name:': 'Firely Server'
+        }
+        # for doc in app_doctors:
+        #     print(f'doctors={doc}')
+
+    except FHIRValidationError:
+        pass
+        # for err in FHIRValidationError.errors:
+        #     print(err)
+
     return context
 
 
@@ -142,6 +263,10 @@ def show_table(request, page_type):
         import fhirclient.models.patient as app
         rows = app.Patient.where(struct={}).perform_resources(smart.server)
         html_template = 'home/table-patients.html'
+    elif page_type == 'CONDITIONS':
+        import fhirclient.models.condition as app
+        rows = app.Condition.where(struct={}).perform_resources(smart.server)
+        html_template = 'home/table-conditions.html'
 
     context = {
         'rows': rows,

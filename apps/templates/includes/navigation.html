@@ -39,25 +39,26 @@
                             </li>
                         </ul>
                         <ul class="navbar-nav ml-auto">
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle"
+                                   href="https://appseed.us" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <span class="no-icon">FHIR Server</span>: <span>{{ server_name }}</span>
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                    <a class="dropdown-item" href="#">IRIS local server</a>
+                                    <a class="dropdown-item" href="#">IRIS cloud server</a>
+                                    <a class="dropdown-item" href="https://server.fire.ly/r4">Firely cloud server</a>
+                                    <a class="dropdown-item" href="https://hapi.fhir.org/baseR4/metadata/">HAPI server</a>
+<!--                                    <div class="divider"></div>-->
+<!--                                    <a class="dropdown-item" href="#">Separated link</a>-->
+                                </div>
+                            </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="/user.html">
                                     <span class="no-icon">Account</span>
                                 </a>
                             </li>
-<!--                            <li class="nav-item dropdown">-->
-<!--                                <a class="nav-link dropdown-toggle" -->
-<!--                                   href="https://appseed.us" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">-->
-<!--                                    <span class="no-icon">Dropdown</span>-->
-<!--                                </a>-->
-<!--                                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">-->
-<!--                                    <a class="dropdown-item" href="#">Action</a>-->
-<!--                                    <a class="dropdown-item" href="#">Another action</a>-->
-<!--                                    <a class="dropdown-item" href="#">Something</a>-->
-<!--                                    <a class="dropdown-item" href="#">Something else here</a>-->
-<!--                                    <div class="divider"></div>-->
-<!--                                    <a class="dropdown-item" href="#">Separated link</a>-->
-<!--                                </div>-->
-<!--                            </li>-->
+
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'logout' %}">
                                     <span class="no-icon">Log out</span>

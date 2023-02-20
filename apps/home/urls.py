@@ -10,11 +10,12 @@ urlpatterns = [
 
     # The home page
     path('', views.index, name='home'),
-    path('appointments',        views.show_table, {'page_type': 'APPOINTMENTS'},   name='appointments'),
-    path('hospitals',           views.show_table, {'page_type': 'HOSPITALS'},      name='hospitals'),
+    path('appointments',        views.show_table, {'page_type': 'APPOINTMENTS'},    name='appointments'),
+    path('hospitals',           views.show_table, {'page_type': 'HOSPITALS'},       name='hospitals'),
     path('healthcare-services', views.show_table, {'page_type': 'HEALTHCARE_SERVICES'},   name='healthcare-services'),
-    path('practitioners',       views.show_table, {'page_type': 'PRACTITIONERS'},  name='practitioners'),
-    path('patients',            views.show_table, {'page_type': 'PATIENTS'},       name='patients'),
+    path('practitioners',       views.show_table, {'page_type': 'PRACTITIONERS'},   name='practitioners'),
+    path('patients',            views.show_table, {'page_type': 'PATIENTS'},        name='patients'),
+    path('conditions',          views.show_table, {'page_type': 'CONDITIONS'},      name='conditions'),
 
     # Add row
     path('add-appointment',     views.add_edit_appointment,  name='add-appointment'),

@@ -1,6 +1,10 @@
+body {
+    font-family: 'Montserrat', sans-serif;
+}
+
 .stat {
     white-space: nowrap;
-    overflow: hidden;
+    /* overflow: hidden; */
     text-overflow: ellipsis;
     display: inline-block;
     margin-right: 10px;
@@ -26,7 +30,7 @@
 }
 
 .stat .name {
-    overflow: hidden;
+    /* overflow: hidden; */
     text-overflow: ellipsis;
 }
 
