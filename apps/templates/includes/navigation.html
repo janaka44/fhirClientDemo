@@ -41,14 +41,17 @@
                         <ul class="navbar-nav ml-auto">
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle"
-                                   href="https://appseed.us" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <span class="no-icon">FHIR Server</span>: <span>{{ server_name }}</span>
+                                    id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <span class="no-icon"></span> <span> {{ server_name }}</span>
                                 </a>
                                 <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                                    <a class="dropdown-item" href="#">IRIS local server</a>
-                                    <a class="dropdown-item" href="#">IRIS cloud server</a>
-                                    <a class="dropdown-item" href="https://server.fire.ly/r4">Firely cloud server</a>
-                                    <a class="dropdown-item" href="https://hapi.fhir.org/baseR4/metadata/">HAPI server</a>
+                                    <a class="dropdown-item" href="http://127.0.0.1:8000/?server=1">IRIS local server</a>
+                                    <a class="dropdown-item" href="http://127.0.0.1:8000/?server=2">IRIS cloud server
+                                    <a class="dropdown-item" href="http://127.0.0.1:8000/?server=3">HAPI server</a>
+                                    <a class="dropdown-item" href="http://127.0.0.1:8000/?server=4">Firely server</a>
+                                    <a class="dropdown-item" href="http://127.0.0.1:8000/?server=5">Cerner server</a>
+                                    <a class="dropdown-item" href="http://127.0.0.1:8000/?server=6">Epic server</a>
+
 <!--                                    <div class="divider"></div>-->
 <!--                                    <a class="dropdown-item" href="#">Separated link</a>-->
                                 </div>

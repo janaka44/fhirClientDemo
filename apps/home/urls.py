@@ -15,7 +15,10 @@ urlpatterns = [
     path('healthcare-services', views.show_table, {'page_type': 'HEALTHCARE_SERVICES'},   name='healthcare-services'),
     path('practitioners',       views.show_table, {'page_type': 'PRACTITIONERS'},   name='practitioners'),
     path('patients',            views.show_table, {'page_type': 'PATIENTS'},        name='patients'),
-    path('conditions',          views.show_table, {'page_type': 'CONDITIONS'},      name='conditions'),
+    path('observations',        views.show_table, {'page_type': 'OBSERVATIONS'},      name='observations'),
+    path('reports/<int:report_no>/',    views.show_report,          name='reports'),
+    path('smart-app-register/',         views.register_smart_app,   name='register_smart_app'),
+    path('launch-smart-app/',           views.launch_smart_app,     name='launch-smart-app'),
 
     # Add row
     path('add-appointment',     views.add_edit_appointment,  name='add-appointment'),

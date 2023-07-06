@@ -3,59 +3,106 @@
 {% block title %} Dashboard {% endblock %} 
 
 <!-- Specific Page CSS goes HERE  -->
-{% block stylesheets %}{% endblock stylesheets %}
+{% block stylesheets %}
+<style>
+.dashboard-page { display:none; }
+
+#loading {
+  display: flex;
+  position: fixed;
+  z-index: 1000;
+  width: 50%;
+  height: 50%;
+  left:30%;
+  top:20%;
+  background-image: url({{ ASSETS_ROOT }}/img/loading.gif);
+  background-repeat: no-repeat;
+  background-position: center;
+}
+</style>
+
+{% endblock stylesheets %}
+
+{% block scripts %}
+<script>
+function init(){
+    const wait = (delay = 0) =>
+      new Promise(resolve => setTimeout(resolve, delay));
+
+    const setVisible = (elementOrSelector, visible) =>
+      (typeof elementOrSelector === 'string'
+        ? document.querySelector(elementOrSelector)
+        : elementOrSelector
+      ).style.display = visible ? 'block' : 'none';
+
+    $('.dashboard-page').hide();
+    $('#loading').show();
+}
+</script>
+{% endblock scripts %}
 
 {% block content %}
 
-    <div class="content dashboard-page">
-        <div class="container-fluid">
+<div id="loading"></div>
 
-            <div class="row">
-                <div class="col-md-8" style="border:0px solid red;">
-                    <div class="card stats">
-                        <div class="card-header ">
-                            <h4 class="card-title">Stats ()</h4>
-<!--#                            <div id="chartPreferences" class="ct-chart ct-perfect-fourth"></div>-->
-                            <div class="legend">
-                                <i class="fa fa-circle" style="color:#5a5a5a"></i> Basic
-                                <i class="fa fa-circle" style="color:#25629f"></i> Planning
-                                <i class="fa fa-circle" style="color:#dc3545"></i> Clinical
-                                <i class="fa fa-circle" style="color:#28a745"></i> Financial
+<div class="content dashboard-page">
+    <div class="container-fluid">
+
+        <div class="row">
+            <div class="col-md-9" style="border:0px solid red;">
+                <div class="card stats">
+                    <div class="row">
+                        <div class="col-8">
+                            <div class="card-header ">
+                                <h4 class="card-title">Summary : {{ server_name }} {{ error }}</h4>
+<!--                                    <div id="chartPreferences" class="ct-chart ct-perfect-fourth"></div>-->
+                                <div class="legend">
+                                    <i class="fa fa-circle" style="color:#5a5a5a"></i> Basic
+                                    <i class="fa fa-circle" style="color:#25629f"></i> Planning
+                                    <i class="fa fa-circle" style="color:#dc3545"></i> Clinical
+                                    <i class="fa fa-circle" style="color:#28a745"></i> Financial
+                                </div>
+
+                                <p style="font-size:14px">Server URL: <a href="{{ server_url }}">{{ server_url }}</a></p>
+                                <p class="card-category">{{ stat_summary }} | Time to fetch: {{ refresh_time }} secs.</p>
                             </div>
-<!--                            <p class="card-category">last 6 months</p>-->
                         </div>
-                        <div class="card-body " style="margin:15px">
+                        <div class="col-4" style="text-align: right; padding: 10px 40px;">
+                            <img  alt="" src="{{ ASSETS_ROOT }}/img/logos/{{logo_file}}" width="100px">
+                        </div>
+                    </div>
+                    <div class="card-body " style="margin:15px">
 <!--                            <div id="chartHours" class="ct-chart"></div>-->
 
-                            <div class="row" style="border-top:2px solid #cdcdcd;">
-                                <div class="col-md-12 text-right"><h3 class="card-title" style="color: #cdcdcd">Basic</h3></div>
-                                {% for row in base_list %}
-                                    {% include "layouts/resource_stat_box.html" %}
-                                {% endfor %}
-                            </div>
-
-                            <div class="row" style="border-top:2px solid #cdcdcd;">
-                                <div class="col-md-12 text-right"><h3 class="card-title" style="color: #cdcdcd">Clinical</h3></div>
-                                {% for row in clinical_list %}
-                                    {% include "layouts/resource_stat_box.html" %}
-                                {% endfor %}
-                            </div>
-
-                            <div class="row" style="border-top:2px solid #cdcdcd;">
-                                <div class="col-md-12 text-right"><h3 class="card-title" style="color: #cdcdcd">Planning</h3></div>
-                                {% for row in planning_list %}
-                                    {% include "layouts/resource_stat_box.html" %}
-                                {% endfor %}
-                            </div>
-
-                            <div class="row" style="border-top:2px solid #cdcdcd;">
-                                <div class="col-md-12 text-right"><h3 class="card-title" style="color: #cdcdcd">Financial</h3></div>
-                                {% for row in financial_list %}
-                                    {% include "layouts/resource_stat_box.html" %}
-                                {% endfor %}
-                            </div>
-
+                        <div class="row" style="border-top:2px solid #cdcdcd;">
+                            <div class="col-md-12 text-right"><h3 class="card-title" style="color: #cdcdcd">Basic</h3></div>
+                            {% for row in base_list %}
+                                {% include "layouts/resource_stat_box.html" %}
+                            {% endfor %}
                         </div>
+
+                        <div class="row" style="border-top:2px solid #cdcdcd;">
+                            <div class="col-md-12 text-right"><h3 class="card-title" style="color: #cdcdcd">Clinical</h3></div>
+                            {% for row in clinical_list %}
+                                {% include "layouts/resource_stat_box.html" %}
+                            {% endfor %}
+                        </div>
+
+                        <div class="row" style="border-top:2px solid #cdcdcd;">
+                            <div class="col-md-12 text-right"><h3 class="card-title" style="color: #cdcdcd">Planning</h3></div>
+                            {% for row in planning_list %}
+                                {% include "layouts/resource_stat_box.html" %}
+                            {% endfor %}
+                        </div>
+
+                        <div class="row" style="border-top:2px solid #cdcdcd;">
+                            <div class="col-md-12 text-right"><h3 class="card-title" style="color: #cdcdcd">Financial</h3></div>
+                            {% for row in financial_list %}
+                                {% include "layouts/resource_stat_box.html" %}
+                            {% endfor %}
+                        </div>
+
+                    </div>
 <!--                        <div class="card-footer ">-->
 <!--                            <div class="legend">-->
 <!--                                <i class="fa fa-circle text-info"></i> Pending-->
@@ -67,216 +114,216 @@
 <!--                                <i class="fa fa-history"></i> Updated 3 minutes ago-->
 <!--                            </div>-->
 <!--                        </div>-->
-                    </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="card ">
-                                <div class="card-header ">
-                                    <h4 class="card-title">Appointments by Doctor</h4>
-                                    <p class="card-category"></p>
-                                </div>
-                                <div class="card-body ">
-                                    <table class="table table-hover table-striped">
-                                        <thead>
-                                            <th>Priority</th>
-                                            <th>Date / Time</th>
-                                            <th>Status</th>
-                                        </thead>
-                                        <tbody>
-                                        {% for row in app_doctors %}
-                                            {% if row.doctor != '' %}
-                                                <tr style="background:#25629fbb; color:white;">
-                                                    <td colspan="3" style="display: revert;"><i class="fas fa-user-md" style="color:black; padding-right:10px">&nbsp;</i>{{ row.doctor }}</td>
-                                                </tr>
-                                            {% endif %}
-
-                                            <tr class="even pointer">
-                                                <td>{{ row.priority }}</td>
-                                                <td>{{ row.date  }}</td>
-                                                <td>{{ row.status }}</td>
-                                            </tr>
-                                        {% endfor %}
-                                        </tbody>
-                                    </table>
-        <!--                            <div class="stats">-->
-        <!--                                <i class="fa fa-clock-o"></i> Campaign sent 2 days ago-->
-        <!--                            </div>-->
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-12">
-                             <a href="load-appointments" href="">
-                                <button>Load Appointments</button>
-                             </a>
-                        </div>
-                    </div>
-                </div>
-
             </div>
-            <div class="row" style="display:none">
-                <div class="col-md-6">
-                    <div class="card ">
-                        <div class="card-header ">
-                            <h4 class="card-title">2017 Sales</h4>
-                            <p class="card-category">All products including Taxes</p>
-                        </div>
-                        <div class="card-body ">
-                            <div id="chartActivity" class="ct-chart"></div>
-                        </div>
-                        <div class="card-footer ">
-                            <div class="legend">
-                                <i class="fa fa-circle text-info"></i> Tesla Model S
-                                <i class="fa fa-circle text-danger"></i> BMW 5 Series
+            <div class="col-md-3">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card ">
+                            <div class="card-header ">
+                                <h4 class="card-title">Appointments by Doctor</h4>
+                                <p class="card-category"></p>
                             </div>
-                            <hr>
-                            <div class="stats">
-                                <i class="fa fa-check"></i> Data information certified
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card  card-tasks">
-                        <div class="card-header ">
-                            <h4 class="card-title">Tasks</h4>
-                            <p class="card-category">Backend development</p>
-                        </div>
-                        <div class="card-body ">
-                            <div class="table-full-width">
-                                <table class="table">
+                            <div class="card-body ">
+                                <table class="table table-hover table-striped">
+                                    <thead>
+                                        <th>Priority</th>
+                                        <th>Date / Time</th>
+                                        <th>Status</th>
+                                    </thead>
                                     <tbody>
-                                        <tr>
-                                            <td>
-                                                <div class="form-check">
-                                                    <label class="form-check-label">
-                                                        <input class="form-check-input" type="checkbox" value="">
-                                                        <span class="form-check-sign"></span>
-                                                    </label>
-                                                </div>
-                                            </td>
-                                            <td>Sign contract for "What are conference organizers afraid of?"</td>
-                                            <td class="td-actions text-right">
-                                                <button type="button" rel="tooltip" title="Edit Task" class="btn btn-info btn-simple btn-link">
-                                                    <i class="fa fa-edit"></i>
-                                                </button>
-                                                <button type="button" rel="tooltip" title="Remove" class="btn btn-danger btn-simple btn-link">
-                                                    <i class="fa fa-times"></i>
-                                                </button>
-                                            </td>
+                                    {% for row in app_doctors %}
+                                        {% if row.doctor != '' %}
+                                            <tr style="background:#25629fbb; color:white;">
+                                                <td colspan="3" style="display: revert;"><i class="fas fa-user-md" style="color:black; padding-right:10px">&nbsp;</i>{{ row.doctor }}</td>
+                                            </tr>
+                                        {% endif %}
+
+                                        <tr class="even pointer">
+                                            <td>{{ row.priority }}</td>
+                                            <td>{{ row.date  }}</td>
+                                            <td>{{ row.status }}</td>
                                         </tr>
-                                        <tr>
-                                            <td>
-                                                <div class="form-check">
-                                                    <label class="form-check-label">
-                                                        <input class="form-check-input" type="checkbox" value="" checked>
-                                                        <span class="form-check-sign"></span>
-                                                    </label>
-                                                </div>
-                                            </td>
-                                            <td>Lines From Great Russian Literature? Or E-mails From My Boss?</td>
-                                            <td class="td-actions text-right">
-                                                <button type="button" rel="tooltip" title="Edit Task" class="btn btn-info btn-simple btn-link">
-                                                    <i class="fa fa-edit"></i>
-                                                </button>
-                                                <button type="button" rel="tooltip" title="Remove" class="btn btn-danger btn-simple btn-link">
-                                                    <i class="fa fa-times"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div class="form-check">
-                                                    <label class="form-check-label">
-                                                        <input class="form-check-input" type="checkbox" value="" checked>
-                                                        <span class="form-check-sign"></span>
-                                                    </label>
-                                                </div>
-                                            </td>
-                                            <td>Flooded: One year later, assessing what was lost and what was found when a ravaging rain swept through metro Detroit
-                                            </td>
-                                            <td class="td-actions text-right">
-                                                <button type="button" rel="tooltip" title="Edit Task" class="btn btn-info btn-simple btn-link">
-                                                    <i class="fa fa-edit"></i>
-                                                </button>
-                                                <button type="button" rel="tooltip" title="Remove" class="btn btn-danger btn-simple btn-link">
-                                                    <i class="fa fa-times"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div class="form-check">
-                                                    <label class="form-check-label">
-                                                        <input class="form-check-input" type="checkbox" checked>
-                                                        <span class="form-check-sign"></span>
-                                                    </label>
-                                                </div>
-                                            </td>
-                                            <td>Create 4 Invisible User Experiences you Never Knew About</td>
-                                            <td class="td-actions text-right">
-                                                <button type="button" rel="tooltip" title="Edit Task" class="btn btn-info btn-simple btn-link">
-                                                    <i class="fa fa-edit"></i>
-                                                </button>
-                                                <button type="button" rel="tooltip" title="Remove" class="btn btn-danger btn-simple btn-link">
-                                                    <i class="fa fa-times"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div class="form-check">
-                                                    <label class="form-check-label">
-                                                        <input class="form-check-input" type="checkbox" value="">
-                                                        <span class="form-check-sign"></span>
-                                                    </label>
-                                                </div>
-                                            </td>
-                                            <td>Read "Following makes Medium better"</td>
-                                            <td class="td-actions text-right">
-                                                <button type="button" rel="tooltip" title="Edit Task" class="btn btn-info btn-simple btn-link">
-                                                    <i class="fa fa-edit"></i>
-                                                </button>
-                                                <button type="button" rel="tooltip" title="Remove" class="btn btn-danger btn-simple btn-link">
-                                                    <i class="fa fa-times"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div class="form-check">
-                                                    <label class="form-check-label">
-                                                        <input class="form-check-input" type="checkbox" value="" disabled>
-                                                        <span class="form-check-sign"></span>
-                                                    </label>
-                                                </div>
-                                            </td>
-                                            <td>Unfollow 5 enemies from twitter</td>
-                                            <td class="td-actions text-right">
-                                                <button type="button" rel="tooltip" title="Edit Task" class="btn btn-info btn-simple btn-link">
-                                                    <i class="fa fa-edit"></i>
-                                                </button>
-                                                <button type="button" rel="tooltip" title="Remove" class="btn btn-danger btn-simple btn-link">
-                                                    <i class="fa fa-times"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
+                                    {% endfor %}
                                     </tbody>
                                 </table>
+    <!--                            <div class="stats">-->
+    <!--                                <i class="fa fa-clock-o"></i> Campaign sent 2 days ago-->
+    <!--                            </div>-->
                             </div>
                         </div>
-                        <div class="card-footer ">
-                            <hr>
-                            <div class="stats">
-                                <i class="now-ui-icons loader_refresh spin"></i> Updated 3 minutes ago
-                            </div>
+                    </div>
+                    <div class="col-md-12">
+                         <a href="load-appointments">
+                            <button>Load Appointments</button>
+                         </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="row" style="display:none">
+            <div class="col-md-6">
+                <div class="card ">
+                    <div class="card-header ">
+                        <h4 class="card-title">2017 Sales</h4>
+                        <p class="card-category">All products including Taxes</p>
+                    </div>
+                    <div class="card-body ">
+                        <div id="chartActivity" class="ct-chart"></div>
+                    </div>
+                    <div class="card-footer ">
+                        <div class="legend">
+                            <i class="fa fa-circle text-info"></i> Tesla Model S
+                            <i class="fa fa-circle text-danger"></i> BMW 5 Series
+                        </div>
+                        <hr>
+                        <div class="stats">
+                            <i class="fa fa-check"></i> Data information certified
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card  card-tasks">
+                    <div class="card-header ">
+                        <h4 class="card-title">Tasks</h4>
+                        <p class="card-category">Backend development</p>
+                    </div>
+                    <div class="card-body ">
+                        <div class="table-full-width">
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <label class="form-check-label">
+                                                    <input class="form-check-input" type="checkbox" value="">
+                                                    <span class="form-check-sign"></span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td>Sign contract for "What are conference organizers afraid of?"</td>
+                                        <td class="td-actions text-right">
+                                            <button type="button" rel="tooltip" title="Edit Task" class="btn btn-info btn-simple btn-link">
+                                                <i class="fa fa-edit"></i>
+                                            </button>
+                                            <button type="button" rel="tooltip" title="Remove" class="btn btn-danger btn-simple btn-link">
+                                                <i class="fa fa-times"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <label class="form-check-label">
+                                                    <input class="form-check-input" type="checkbox" value="" checked>
+                                                    <span class="form-check-sign"></span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td>Lines From Great Russian Literature? Or E-mails From My Boss?</td>
+                                        <td class="td-actions text-right">
+                                            <button type="button" rel="tooltip" title="Edit Task" class="btn btn-info btn-simple btn-link">
+                                                <i class="fa fa-edit"></i>
+                                            </button>
+                                            <button type="button" rel="tooltip" title="Remove" class="btn btn-danger btn-simple btn-link">
+                                                <i class="fa fa-times"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <label class="form-check-label">
+                                                    <input class="form-check-input" type="checkbox" value="" checked>
+                                                    <span class="form-check-sign"></span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td>Flooded: One year later, assessing what was lost and what was found when a ravaging rain swept through metro Detroit
+                                        </td>
+                                        <td class="td-actions text-right">
+                                            <button type="button" rel="tooltip" title="Edit Task" class="btn btn-info btn-simple btn-link">
+                                                <i class="fa fa-edit"></i>
+                                            </button>
+                                            <button type="button" rel="tooltip" title="Remove" class="btn btn-danger btn-simple btn-link">
+                                                <i class="fa fa-times"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <label class="form-check-label">
+                                                    <input class="form-check-input" type="checkbox" checked>
+                                                    <span class="form-check-sign"></span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td>Create 4 Invisible User Experiences you Never Knew About</td>
+                                        <td class="td-actions text-right">
+                                            <button type="button" rel="tooltip" title="Edit Task" class="btn btn-info btn-simple btn-link">
+                                                <i class="fa fa-edit"></i>
+                                            </button>
+                                            <button type="button" rel="tooltip" title="Remove" class="btn btn-danger btn-simple btn-link">
+                                                <i class="fa fa-times"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <label class="form-check-label">
+                                                    <input class="form-check-input" type="checkbox" value="">
+                                                    <span class="form-check-sign"></span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td>Read "Following makes Medium better"</td>
+                                        <td class="td-actions text-right">
+                                            <button type="button" rel="tooltip" title="Edit Task" class="btn btn-info btn-simple btn-link">
+                                                <i class="fa fa-edit"></i>
+                                            </button>
+                                            <button type="button" rel="tooltip" title="Remove" class="btn btn-danger btn-simple btn-link">
+                                                <i class="fa fa-times"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <label class="form-check-label">
+                                                    <input class="form-check-input" type="checkbox" value="" disabled>
+                                                    <span class="form-check-sign"></span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td>Unfollow 5 enemies from twitter</td>
+                                        <td class="td-actions text-right">
+                                            <button type="button" rel="tooltip" title="Edit Task" class="btn btn-info btn-simple btn-link">
+                                                <i class="fa fa-edit"></i>
+                                            </button>
+                                            <button type="button" rel="tooltip" title="Remove" class="btn btn-danger btn-simple btn-link">
+                                                <i class="fa fa-times"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card-footer ">
+                        <hr>
+                        <div class="stats">
+                            <i class="now-ui-icons loader_refresh spin"></i> Updated 3 minutes ago
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
 {% endblock content %}
 
@@ -288,7 +335,14 @@
         // Javascript method's body can be found in assets/js/demos.js
         demo.initDashboardPageCharts();
 
-        demo.showNotification();
+        //demo.showNotification();
+        $('.dashboard-page').show();
+        $('#loading').hide();
+
+         $('a.dropdown-item').click(function(){
+             $('.dashboard-page').hide();
+             $('#loading').show();
+          });
 
     });
 </script>

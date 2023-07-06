@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'apps.home',  # Enable the inner home (home)
     'django.contrib.humanize',
     'crispy_forms',
+    'django_plotly_dash.apps.DjangoPlotlyDashConfig',
 ]
 
 MIDDLEWARE = [
@@ -53,6 +54,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_plotly_dash.middleware.BaseMiddleware',
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -148,3 +150,17 @@ STATICFILES_DIRS = (
 
 #############################################################
 #############################################################
+# Add STATICFILES_FINDERS
+# STATICFILES_FINDERS = [
+#     'django_plotly_dash.finders.DashAssetFinder',
+#     'django_plotly_dash.finders.DashComponentFinder'
+# ]
+#
+# # Add PLOTLY_COMPONENTS
+# PLOTLY_COMPONENTS = [
+#     'dash_core_components',
+#     'dash_html_components',
+#     'dash_renderer',
+#     'dpd_components']
+
+X_FRAME_OPTIONS = 'SAMEORIGIN'

@@ -8,6 +8,7 @@ import math
 from django import template
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.shortcuts import redirect
 from django.template import loader
 from django.template.loader import render_to_string
 from django.urls import reverse
@@ -24,35 +25,86 @@ from fhirclient.models.fhirabstractbase import FHIRValidationError
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
+logo_file = ""
+server_number = 1
+server_url = ''
+server_name = ''
 
 
 @login_required(login_url="/login/")
 def index(request):
+    global server_number
+    server_requested = int(request.GET.get('server', '0'))
+    if server_requested != 0:
+        server_number = server_requested
+    print(f'server_number={server_number}')
     context = {'segment': 'index'}
-    context = get_stats()
+    context = get_stats(server_number)
     html_template = loader.get_template('home/index.html')
     return HttpResponse(html_template.render(context, request))
 
 
-def create_smart_client():
+def create_smart_client(server):
+    global logo_file
+    global server_number
+    global server_url
+    global server_name
     # Init FHIR Server
-    settings1 = {
-        'app_id': 'IRIS_LOCAL_SERVER',
-        'api_base': 'http://localhost:52773/csp/healthshare/fhirserveriris/fhir/r4'
-    }
+    settings = {}
 
-    settings2 = {
-        'app_id': 'HAPI_CLOUD_SERVER',
-        'api_base': 'https://hapi.fhir.org/baseR4'
-    }
+    # use previously set server number if not given
+    if server == 0 or server is None:
+        server = server_number
+    else:
+        server_number = server
 
-    settings = {
-        'app_id': 'FIRELY_CLOUD_SERVER',
-        'api_base': 'https://server.fire.ly/r4'
-    }
+    if server_number == 1:
+        server_name = 'InterSystems IRIS Local server'
+        logo_file = 'IRIS.png'
+        settings = {
+            'app_id': 'IRIS_LOCAL_SERVER',
+            'api_base': 'http://localhost:52773/csp/healthshare/fhirserveriris/fhir/r4'
+        }
+    elif server_number == 2:
+        server_name = 'InterSystems IRIS Cloud server'
+        logo_file = 'IRIS.png'
+        settings = {
+            'app_id': 'IRIS_CLOUD_SERVER',
+            'api_base': 'https://fhir.yxlrtoae.static-test-account.isccloud.io'
+        }
+    elif server_number == 3:
+        server_name = 'HAPI server'
+        logo_file = 'Hapi.png'
+        settings = {
+            'app_id': 'HAPI_CLOUD_SERVER',
+            'api_base': 'https://hapi.fhir.org/baseR4'
+        }
+    elif server_number == 4:
+        server_name = 'Firely server'
+        logo_file = 'firely.jpg'
+        settings = {
+            'app_id': 'FIRELY_CLOUD_SERVER',
+            'api_base': 'https://server.fire.ly/r4'
+        }
+    elif server_number == 5:
+        server_name = 'Cerner server'
+        logo_file = 'cerner.png'
+        settings = {
+            'app_id': 'CERNER_CLOUD_SERVER',
+            'api_base': 'https://fhir-open.cerner.com/r4/ec2458f2-1e24-41c8-b71b-0e701af7583d'
+        }
+    elif server_number == 6:
+        server_name = 'EPIC server'
+        logo_file = 'Epic.png'
+        settings = {
+            'app_id': 'EPIC_CLOUD_SERVER',
+            'api_base': 'https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/R4'
+        }
 
-    smart = client.FHIRClient(settings=settings2)
-    return smart
+    print(f'create_smart_client - settings={settings}')
+    server_url = settings["api_base"]
+    smart = client.FHIRClient(settings=settings)
+    return smart, server_name
 
 
 def print_resource(resource, indent=None, length=100):
@@ -81,14 +133,27 @@ def get_stat_row(resource_name, group_name, stat_number, icon_css):
 
 # Get stats from each FHIR Res
 def get_resource_stats(res_class, search_cri, smart_server):
+    import fhirclient.models.bundle as b
+    search_bundle = b.Bundle()
     try:
-        return res_class.where(search_cri).perform_resources(smart_server)
+        return res_class.where(search_cri).perform(smart_server).total
+
     except FHIRValidationError:
-        return () # return an empty list
+        return 0
+
+
+def get_common_context():
+    global server_name
+    global server_url
+    context = {
+        'server_name': server_name,
+        'server_url': server_url,
+    }
+    return context
 
 
 # Get Dashboard stats from ALL FHIR Res
-def get_stats():
+def get_stats(server_number):
     # do local imports
     import fhirclient.models.patient as pat
     import fhirclient.models.appointment as app
@@ -114,14 +179,15 @@ def get_stats():
     import fhirclient.models.claimresponse as cr
     import fhirclient.models.paymentnotice as pn
 
-    smart = create_smart_client()
+    smart, server_name = create_smart_client(server_number)
     context = {}
+    error_msg = ''
 
 # 'participant.actor': '13'
     #     _summary=count,
 
     # appointments    = app.Appointment.where(struct={'_summary': 'count'}).perform_resources(smart.server)
-    summary_search = struct={'_summary': 'true'}
+    summary_search = struct={'_summary': 'count'}
     # summary_search  = struct = {}
     # list of FHIR classes
     class_list = [app.Appointment, slo.Slot, sch.Schedule, tas.Task, pat.Patient, pra.Practitioner,
@@ -136,49 +202,50 @@ def get_stats():
                   # 19-22
                   ]
     # response object collection
-    collection_list = []
+    count_list = []
 
     try:
         import time
         start = time.time()
         for fhir_class_obj in class_list:
-            collection_list.append(get_resource_stats(fhir_class_obj, summary_search, smart.server))
+            count_list.append(get_resource_stats(fhir_class_obj, summary_search, smart.server))
         end = time.time()
-        print(f'{len(collection_list)} FHIR resources took {math.trunc(end - start)} secs')
+        print(f'{len(count_list)} FHIR resources took {math.trunc(end - start)} secs')
 
         # Construct list of stats into a list of dictionaries
         planning_list = []
-        planning_list.append(get_stat_row('Appointments', 'Planning', len(collection_list[0]), 'fas fa-calendar-check'))
-        planning_list.append(get_stat_row('Slot', 'Planning', len(collection_list[1]), 'fas fa-calendar-day'))
-        planning_list.append(get_stat_row('Schedule', 'Planning', len(collection_list[2]), 'fas fa-calendar-alt'))
-        planning_list.append(get_stat_row('Tasks', 'Planning', len(collection_list[3]), 'fas fa-tasks'))
-        planning_list.append(get_stat_row('Service Requests', 'Planning', len(collection_list[17]), 'fas fa-notes-medical'))
+        planning_list.append(get_stat_row('Appointments', 'Planning',count_list[0], 'fas fa-calendar-check'))
+        planning_list.append(get_stat_row('Slots', 'Planning',count_list[1], 'fas fa-calendar-day'))
+        planning_list.append(get_stat_row('Schedules', 'Planning',count_list[2], 'fas fa-calendar-alt'))
+        planning_list.append(get_stat_row('Tasks', 'Planning',count_list[3], 'fas fa-tasks'))
+        planning_list.append(get_stat_row('Service Requests', 'Planning',count_list[17], 'fas fa-notes-medical'))
 
         base_list = []
-        base_list.append(get_stat_row('Patients', 'Base', len(collection_list[4]), 'fas fa-hospital-user'))
-        base_list.append(get_stat_row('Practitioners', 'Base', len(collection_list[5]), 'fas fa-user-md'))
-        base_list.append(get_stat_row('Hospitals', 'Base', len(collection_list[6]), 'fas fa-clinic-medical'))
-        base_list.append(get_stat_row('Locations', 'Base', len(collection_list[7]), 'fas fa-building'))
-        base_list.append(get_stat_row('Healthcare Services', 'Base', len(collection_list[8]), 'fas fa-briefcase-medical'))
-        base_list.append(get_stat_row('Encounters', 'Base', len(collection_list[9]), 'fas fa-briefcase-medical'))
+        base_list.append(get_stat_row('Patients', 'Base',count_list[4], 'fas fa-hospital-user'))
+        base_list.append(get_stat_row('Practitioners', 'Base',count_list[5], 'fas fa-user-md'))
+        base_list.append(get_stat_row('Hospitals', 'Base',count_list[6], 'fas fa-clinic-medical'))
+        base_list.append(get_stat_row('Locations', 'Base',count_list[7], 'fas fa-building'))
+        base_list.append(get_stat_row('Health. Services', 'Base',count_list[8], 'fas fa-briefcase-medical'))
+        base_list.append(get_stat_row('Encounters', 'Base',count_list[9], 'fas fa-briefcase-medical'))
 
         clinical_list = []
-        clinical_list.append(get_stat_row('Conditions', 'Clinical', len(collection_list[10]), 'fa fa-user-injured'))
-        clinical_list.append(get_stat_row('Allergies', 'Clinical', len(collection_list[11]), 'fas fa-allergies'))
-        clinical_list.append(get_stat_row('Observations', 'Clinical', len(collection_list[13]), 'fas fa-microscope'))
-        clinical_list.append(get_stat_row('Procedures', 'Clinical', len(collection_list[12]), 'fas fa-procedures'))
-        clinical_list.append(get_stat_row('Diagnostic Reports', 'Clinical', len(collection_list[14]), 'fas fa-diagnoses'))
-        clinical_list.append(get_stat_row('Medi. Requests', 'Clinical', len(collection_list[15]), 'fas fa-prescription-bottle'))
-        clinical_list.append(get_stat_row('Medi. Statements', 'Clinical', len(collection_list[16]), 'fas fa-file-prescription'))
-        clinical_list.append(get_stat_row('Medications', 'Clinical', len(collection_list[18]), 'fas fa-capsules'))
-        clinical_list.append(get_stat_row('Immunizations', 'Clinical', len(collection_list[19]), 'fas fa-syringe'))
+        clinical_list.append(get_stat_row('Conditions', 'Clinical',count_list[10], 'fa fa-user-injured'))
+        clinical_list.append(get_stat_row('Allergies', 'Clinical',count_list[11], 'fas fa-allergies'))
+        clinical_list.append(get_stat_row('Observations', 'Clinical',count_list[13], 'fas fa-microscope'))
+        clinical_list.append(get_stat_row('Procedures', 'Clinical',count_list[12], 'fas fa-procedures'))
+        clinical_list.append(get_stat_row('Diag. Reports', 'Clinical',count_list[14], 'fas fa-diagnoses'))
+        clinical_list.append(get_stat_row('Medi. Requests', 'Clinical',count_list[15], 'fas fa-prescription-bottle'))
+        clinical_list.append(get_stat_row('Medi. Statements', 'Clinical',count_list[16], 'fas fa-file-prescription'))
+        clinical_list.append(get_stat_row('Medications', 'Clinical',count_list[18], 'fas fa-capsules'))
+        clinical_list.append(get_stat_row('Immunizations', 'Clinical',count_list[19], 'fas fa-syringe'))
 
         financial_list = []
-        financial_list.append(get_stat_row('Claim', 'Financial', len(collection_list[20]), 'fas fa-file-invoice-dollar'))
-        financial_list.append(get_stat_row('Claim Responses', 'Financial', len(collection_list[21]), 'fas fa-receipt'))
-        financial_list.append(get_stat_row('Payment', 'Financial', len(collection_list[22]), 'far fa-credit-card'))
+        financial_list.append(get_stat_row('Claims', 'Financial',count_list[20], 'fas fa-file-invoice-dollar'))
+        financial_list.append(get_stat_row('Claim Responses', 'Financial',count_list[21], 'fas fa-receipt'))
+        financial_list.append(get_stat_row('Payments', 'Financial',count_list[22], 'far fa-credit-card'))
         # stat_list.append(get_stat_row('', len(), 'fas '))
         # logger.debug(f' len(appointments)={len(appointments)}')
+        print(f'logo_file={logo_file}')
 
 
         # Get appointment list
@@ -226,7 +293,13 @@ def get_stats():
             'planning_list': planning_list,
             'financial_list': financial_list,
             'clinical_list': clinical_list,
-            'server_name:': 'Firely Server'
+            'server_name:': 'Firely Server',
+            'stat_summary': f'{len(count_list)} FHIR resources',
+            'refresh_time': round(end - start, 1),
+            'server_name':  server_name,
+            'logo_file': logo_file,
+            'server_url': server_url,
+            'error': error_msg,
         }
         # for doc in app_doctors:
         #     print(f'doctors={doc}')
@@ -235,14 +308,183 @@ def get_stats():
         pass
         # for err in FHIRValidationError.errors:
         #     print(err)
+    except ConnectionError:
+        k = f'Error connecting to server : {server_name}'
+        context = {
+            'error': error_msg,
+        }
+        pass
 
     return context
+
+
+def generate_report(request):
+    global server_name
+    from django.shortcuts import render
+    from plotly.offline import plot
+    from plotly.graph_objs import Scatter
+
+    # todo: remove server no
+    smart, server_name = create_smart_client(4)
+    report_name = 'Patient Distribution'
+    import fhirclient.models.patient as app
+    patients = app.Patient.where(struct={'_elements': 'birthDate', '_count': '100'}).perform_resources(smart.server)
+    print(f'count(patients)={len(patients)}, type={type(patients)}, type[0]={type(patients[0])}')
+    x_data = []
+    y_data = []
+    age_dist = {}
+    for pat in patients:
+        if type(pat) is app.Patient:
+            if pat.birthDate is not None:
+                birth_year = pat.birthDate.date.year
+                if birth_year > 1800:
+                    if birth_year in age_dist:
+                        age_dist[birth_year] += 1
+                    else:
+                        age_dist[birth_year] = 1
+
+        # sort the dataset
+    # age_dist = sorted(age_dist.items(), key=lambda x:x[1])
+
+    for year in age_dist:
+        print(f'year: {year} = {age_dist[year]}')
+        x_data.append(year)
+        y_data.append(age_dist[year])
+
+    # x_data = [0, 1, 2, 3]
+    # y_data = [x ** 2 for x in x_data]
+
+    plot_div = plot([Scatter(x=x_data, y=y_data,
+                             mode='lines', name='test',
+                             opacity=0.8, marker_color='green')],
+                    output_type='div', include_plotlyjs=False)
+    context = get_common_context()
+    context['report_name'] = report_name
+    context['plot_div'] = plot_div
+    return render(request, "home/reports-1.html", context=context)
+
+
+def generate_report2(request):
+    global server_name
+    from django.shortcuts import render
+    import plotly.express as px
+    import datetime
+    import pandas as pd
+    from pandas import json_normalize
+
+    # todo: remove server no
+    smart, server_name = create_smart_client(3)
+    current_year = datetime.date.today().year
+    report_name = 'Patient Distribution'
+    import fhirclient.models.patient as app
+    patients = app.Patient.where(struct={'_elements': 'birthDate, gender', '_count': '100'}).perform_resources(smart.server)
+    # for pat in patients:
+    #     if type(pat) is app.Patient:
+    #         if pat.birthDate is not None:
+    #             pat['birthYear'] = pat.birthDate.date.year
+    patient_dict = {"bundle": [pat.as_json() for pat in patients]}
+    # print(patient_dict)
+    patient_df = json_normalize(patient_dict['bundle'])
+    # agg_df = patient_df.agg([])
+    fig = px.scatter(patient_df, x="birthYear", y="gender",
+                     # color="species",
+                     # size='petal_length',
+                     # hover_data=['petal_width']
+                     )
+    # print(df2)
+
+    print(f'count(patients)={len(patients)}, type={type(patients)}, type[0]={type(patients[0])}')
+    x_data = []
+    y_data = []
+    age_dist = {}
+    patients_without_bd = 0
+    for pat in patients:
+        if type(pat) is app.Patient:
+            if pat.birthDate is not None:
+                birth_year = pat.birthDate.date.year
+                if 1900 < birth_year <= current_year:
+                    if birth_year in age_dist:
+                        age_dist[birth_year] += 1
+                    else:
+                        age_dist[birth_year] = 1
+            else:
+                patients_without_bd += 1
+        else:
+            print(pat)
+
+    print(f'patients without bd={patients_without_bd}')
+        # sort the dataset
+    # age_dist = sorted(age_dist.items(), key=lambda x:x[1])
+
+    for year in age_dist:
+        print(f'year: {year} = {age_dist[year]}')
+        x_data.append(year)
+        y_data.append(age_dist[year])
+
+    # x_data = [0, 1, 2, 3]
+    # y_data = [x ** 2 for x in x_data]
+
+    # fig = px.scatter(
+    #     x=x_data,
+    #     y=y_data,
+    #     # color=[]
+    #     size=y_data,
+    #     labels={'y': 'No of Patients','x': 'Year born' },
+    #     title=f'No of Patients per birth year: (Sample size: {sum(y_data)} patients)'
+    # )
+    plot_div = fig.to_html()
+    context = get_common_context()
+    context['report_name'] = report_name
+    context['plot_div'] = plot_div
+    return render(request, "home/reports-1.html", context=context)
+
+
+def register_smart_app(request):
+    context = {
+        'rows': None,
+    }
+    html_template = loader.get_template('home/register-smart-app.html')
+    return HttpResponse(html_template.render(context, request))
+
+
+def launch_smart_app(request):
+    smart_app_launch_url = 'https://psddg3.csb.app/launch'
+    # https://launch.smarthealthit.org/v/r4/fhir/.well-known/smart-configuration
+    iss = 'https://launch.smarthealthit.org/v/r4/fhir'
+    # iss = 'http://localhost:52773/csp/healthshare/fhirserveriris/fhir/r4',
+    launch = 'appContext-1'
+    context = {
+        'rows': None,
+        'smart_app_launch_url': 'https://psddg3.csb.app/launch',
+        'iss':  'http://localhost:52773/csp/healthshare/fhirserveriris/fhir/r4',
+        'launch': 'appContext-1'
+    }
+    # html_template = loader.get_template('home/register-smart-app.html')
+    # return HttpResponse(html_template.render(context, request))
+    url = f'{smart_app_launch_url}?iss={iss}&launch={launch}'
+    print(f'redirect_url = {url}')
+    return redirect(url)
+
+
+def show_report(request, report_no):
+    return generate_report2(request)
+
+    smart, server_name = create_smart_client(0)
+    import fhirclient.models.appointment as app
+    rows = app.Appointment.where(struct={}).perform_resources(smart.server)
+    html_template = 'home/reports-1.html'
+    context = {
+        'rows': rows,
+    }
+    print(f'report_no={report_no}')
+    html_template = loader.get_template(html_template)
+    return HttpResponse(html_template.render(context, request))
 
 
 @login_required(login_url="/login/")
 def show_table(request, page_type):
 
-    smart = create_smart_client()
+    smart, server_name = create_smart_client(0)
     if page_type == 'APPOINTMENTS':
         import fhirclient.models.appointment as app
         rows = app.Appointment.where(struct={}).perform_resources(smart.server)
@@ -267,6 +509,10 @@ def show_table(request, page_type):
         import fhirclient.models.condition as app
         rows = app.Condition.where(struct={}).perform_resources(smart.server)
         html_template = 'home/table-conditions.html'
+    elif page_type == 'OBSERVATIONS':
+        import fhirclient.models.observation as app
+        rows = app.Observation.where(struct={}).perform_resources(smart.server)
+        html_template = 'home/table-observations.html'
 
     context = {
         'rows': rows,
@@ -310,7 +556,7 @@ def add_edit_appointment(request):
     listHtmlName = 'AppointmentList.html'
     dtTableHtmlId = '#dtTable-Appointments'
     context = {}
-    smart = create_smart_client()
+    smart, server_name = create_smart_client(0)
 
     # rows = app.Appointment.where(struct={}).perform_resources(smart.server)
     # row = FhirAppointment()

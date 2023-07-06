@@ -1,0 +1,37 @@
+{% extends "layouts/base.html" %}
+{% block scripts %}
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+{% endblock scripts %}
+{% block title %} UI Tables {% endblock %} 
+{% load humanize %}
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+{% endblock stylesheets %}
+
+{% block content %}
+
+    <div class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card strpied-tabled-with-hover">
+                        <div class="card-header ">
+                            <h4 class="card-title"><i class="text-secondary fas fa-calendar-check mr-2"></i>Report: {{ report_name }}</h4>
+                            <p class="card-category"></p>
+                        </div>
+                        <div class="card-body table-full-width table-responsive">
+                            {% autoescape off %}
+                            {{ plot_div|safe }}
+                            {% endautoescape %}
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

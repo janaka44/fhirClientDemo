@@ -1,10 +1,11 @@
+{% load humanize %}
 <div class="col-12 col-sm-4 stat-col mt-2 border-bottom">
     <div class="stat-icon">
         <i class="{{ row.icon }}"></i>
     </div>
-    <div class="stat">
-        <span class="value"> {{ row.number }} </span>
-        <span class="name h5 text-secondary"> {{ row.resource }} </span>
+    <div class="stat" style="max-width: 200px;">
+        <span class="value" style="font-size:20px">{{ row.number|intcomma }}</span>
+        <span class="name h5 text-secondary">{{ row.resource }}</span>
         <h6 class="name " style="border:0px solid black; padding:5px; border-radius:5px; color:white; background-color:{{ row.group_color }}; width:100px;" > {{ row.group_name }} </h6>
     </div>
     <div class="progress stat-progress" style="display:none;">

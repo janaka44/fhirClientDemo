@@ -24,3 +24,6 @@ from fhir.resources.appointment import Appointment
 # class FhirAppointment2(FhirAppointment):
 #     class Meta:
 #         proxy = True
+
+class SmartClient(models.Model):
+        None
